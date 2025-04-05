@@ -1,0 +1,127 @@
+﻿@model BCity.Models.ViewModels.ContactDetailsViewModel
+
+
+@{
+    ViewData["Title"] = "Contact Details";
+}
+
+
+<h2 class="mt-5">Contact Details</h2>
+
+
+@if (TempData["Msg"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["Msg"])
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+<!-- tab navigation -->
+<ul class="nav nav-tabs mt-5" id="clientTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="general-tab" data-bs-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="clients-tab" data-bs-toggle="tab" href="#clients" role="tab" aria-controls="clients" aria-selected="false">Clients</a>
+    </li>
+</ul>
+
+
+<!-- tab content -->
+<div class="tab-content mt-3" id="clientTabsContent">
+
+
+    <!-- general -->
+    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+        <div class="card shadow-sm mt-3 p-4">
+            <p><strong>Name:</strong> @Model.Contact.Name</p>
+            <p><strong>Surname:</strong> @Model.Contact.Surname</p>
+            <p><strong>Email:</strong> @Model.Contact.Email</p>
+            <p><strong>No. of Linked Contacts:</strong> @Model.Contact.NoOfLinkedClients</p>
+        </div>
+    </div>
+
+        
+    <!-- contacts -->
+    <div class="tab-pane fade" id="clients" role="tabpanel" aria-labelledby="contacts-tab">
+        <div class="card shadow-sm mt-3 p-4">
+            <h3>Clients:</h3>
+            @if (Model.UnlinkedClients.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Name</th>
+                            <th class="text-start">Client Code</th>
+                            <th class="text-center">Link Client</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var client in Model.UnlinkedClients)
+                        {
+                            <tr>
+                                <td class="text-start">@client.Name</td>
+                                <td class="text-start">@client.ClientCode</td>
+                                <td class="text-center">
+                                    <form asp-action="LinkClient" method="post">
+                                        <input type="hidden" name="clientId" value="@client.Id" />
+                                        <input type="hidden" name="contactId" value="@Model.Contact.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success">Link</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No available clients to link.</p>
+            }
+        </div>
+
+
+        <div class="card shadow-sm mt-3 p-4">
+            <h3>Linked Contacts:</h3>
+            @if (Model.LinkedClients.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Name</th>
+                            <th class="text-start">Client Code</th>
+                            <th class="text-center">Unlink Client</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var client in Model.LinkedClients)
+                        {
+                            <tr>
+                                <td class="text-start">@client.Name</td>
+                                <td class="text-start">@client.ClientCode</td>
+                                <td class="text-center">
+                                    <form asp-action="UnlinkClient" method="post">
+                                        <input type="hidden" name="clientId" value="@client.Id" />
+                                        <input type="hidden" name="contactId" value="@Model.Contact.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">Unlink</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No clients found.</p>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="card shadow-sm mt-3 p-4">
+    <a href="@Url.Action("Index", "Contact")" class="btn btn-secondary">Back to List</a>
+</div>

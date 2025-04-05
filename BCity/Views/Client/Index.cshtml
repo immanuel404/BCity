@@ -1,0 +1,188 @@
+﻿@model IEnumerable<BCity.Models.Client>
+
+
+@{
+    ViewData["Title"] = "Clients";
+    var clientName = TempData["Name"]?.ToString();
+    var clientCode = TempData["ClientCode"]?.ToString();
+}
+
+
+<div class="container mt-5">
+    <h1 class="text-secondary mb-4">Client Management</h1>
+
+    <div class="row">
+        <!-- Create Client Form -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Create Client</h5>
+                </div>
+                <div class="card-body">
+                    @if (string.IsNullOrEmpty(clientCode))
+                    {
+                        <form asp-action="GenerateClientCode" method="post" id="GenerateClientCodeForm">
+                            <div class="mb-3">
+                                <label for="Name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="Name" name="Name"/>
+                                @if (TempData["NameField_Error"] != null)
+                                {
+                                    <div class="text-danger mt-1">
+                                        @TempData["NameField_Error"]
+                                    </div>
+                                }
+                            </div>
+                            <button type="submit" class="btn btn-dark w-100">Generate Client Code</button>
+                        </form>
+                    }
+                    else {
+                        <form asp-action="Create" method="post" id="createClientForm">
+                            <div class="mb-3">
+                                <label for="Name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="Name" name="Name" value="@clientName" readonly/>
+                                @if (TempData["NameField_Error"] != null)
+                                {
+                                    <div class="text-danger mt-1">
+                                        @TempData["NameField_Error"]
+                                    </div>
+                                }
+                            </div>
+                            <div class="mb-3">
+                                <label for="ClientCode" class="form-label">Client Code</label>
+                                <input type="text" class="form-control" id="ClientCode" name="ClientCode" value="@clientCode" readonly />
+                                @if (TempData["ClientCodeField_Error"] != null)
+                                {
+                                    <div class="text-danger mt-1">
+                                        @TempData["ClientCodeField_Error"]
+                                    </div>
+                                }
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-dark w-100">Add New Client</button>
+                            </div>
+                        </form>
+
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-dark w-100" onclick="location.reload();">Refresh</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Client List Table -->
+        <div class="col-md-8 mt-4 mt-md-0">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Clients List</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <table class="table table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-start">Name</th>
+                                    <th class="text-start">Client Code</th>
+                                    <th class="text-center">No. of Linked Contacts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var client in Model)
+                                {
+                                    <tr>
+                                        <td class="text-start">
+                                            <a asp-action="Details" asp-route-id="@client.Id" class="text-decoration-none">@client.Name</a>
+                                        </td>
+                                        <td class="text-start">@client.ClientCode</td>
+                                        <td class="text-center">@client.NoOfLinkedContacts</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    } else {
+                        <p class="mt-2 text-center">No client(s) found</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Go Back -->
+    <div class="card shadow-sm mt-3 p-4">
+        <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Return</a>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        // client side validation
+
+        // on-form submit -> client code
+        var generateClientCodeForm = document.getElementById('GenerateClientCodeForm');
+
+        if (generateClientCodeForm) {
+            generateClientCodeForm.addEventListener('submit', function (event) {
+                var nameField = document.getElementById('Name');
+                var nameValue = nameField.value.trim();
+
+                // if name field is empty
+                if (nameValue === "") {
+                    event.preventDefault();
+                    alert("Name is required.");
+                    nameField.focus();
+                }
+
+                // if the name length is greater than 25 characters
+                if (nameValue.length > 25) {
+                    event.preventDefault();
+                    alert("Name must be less than 25 characters.");
+                    nameField.focus();
+                }
+            });
+        }
+
+
+        // on-form submit -> create new client
+        var createClientForm = document.getElementById('createClientForm');
+
+        if (createClientForm) {
+            createClientForm.addEventListener('submit', function (event) {
+                var nameField = document.getElementById('Name');
+                var nameValue = nameField.value.trim();
+                var clientCodeField = document.getElementById('ClientCode');
+                var clientCodeValue = clientCodeField.value.trim();
+
+                // if name field is empty
+                if (nameValue === "") {
+                    event.preventDefault();
+                    alert("Name is required.");
+                    nameField.focus();
+                }
+
+                // if name length is greater than 25 characters
+                if (nameValue.length > 25) {
+                    event.preventDefault();
+                    alert("Name must be less than 25 characters.");
+                    nameField.focus();
+                }
+
+                // if client code field is empty
+                if (clientCodeValue === "") {
+                    event.preventDefault();
+                    alert("Client Code is required. Click refresh button.");
+                    clientCodeField.focus();
+                }
+
+                // if client code must be 6 characters
+                if (clientCodeValue.length != 6) {
+                    event.preventDefault();
+                    alert("Client Code is must be 6 characters in length. Click refresh button.");
+                    clientCodeField.focus();
+                }
+            });
+        }
+    </script>
+}

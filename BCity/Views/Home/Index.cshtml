@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div class="container text-center">
+    <br />
+    <h1 class="display-4 text-secondary">Welcome</h1>
+    <br/>
+    <br/>
+    <p class="lead text-muted">
+        <a href="@Url.Action("Index", "Client")" class="btn btn-dark">Manage Clients</a>
+        <span class="mx-2">|</span>
+        <a href="@Url.Action("Index", "Contact")" class="btn btn-dark">Manage Contacts</a>
+    </p>
+</div>
